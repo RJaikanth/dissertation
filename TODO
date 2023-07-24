@@ -1,0 +1,25 @@
+ASPSet (1 week)
+---------------
+1. Extract 2D coordinates (Done for a single image).
+2. Check correctness of 2D coordinates (Done).
+3. Extract image with bounding box for better visibility and scale.
+4. Convert to YOLO-Friendly format (COCO).
+5. Upload to kaggle.
+6. Finetune YOLO on dataset.
+7. Validate.
+
+SportsPose (2 days)
+-------------------
+1. Use custom YOLO to extract 2D coordinates.
+
+
+Elevation (2 days)
+------------------
+1. Train a simple feed forward network to elevate 2D to 3D points (Brute force learning).
+2. Validate and test
+
+
+Comparison (3-4 days)
+---------------------
+1. Use a messi free-kick video to check as base.
+2. Use DTW to compare the 2 sets of skeletal data.

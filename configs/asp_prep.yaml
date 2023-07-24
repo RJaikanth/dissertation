@@ -1,0 +1,15 @@
+#model:
+#  object: /home/rjaikanth97/myspace/dissertation-final/dissertation/models/objdet/yolov8l.pt
+
+dataset:
+  data_root: /home/rjaikanth97/myspace/dissertation-final/dissertation/ASPset/trainval
+  v_ext: mkv
+  i_ext: jpg
+  v_frame_frequency: 5
+  i_size: [1280, 736]
+
+dataloader:
+  batch_size: 128
+  shuffle: False
+  drop_last: False
+  num_workers: 8
