@@ -1,6 +1,14 @@
 """
 dissertation.c3d.py
 Author: Raghhuveer Jaikanth
+Date  : 25/07/2023
+
+# Enter Description Here
+"""
+
+"""
+dissertation.c3d.py
+Author: Raghhuveer Jaikanth
 Date  : 17/07/2023
 
 Utility functions for c3d files

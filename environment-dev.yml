@@ -234,4 +234,6 @@ dependencies:
   - yaml=0.2.5=h7f98852_2
   - zlib=1.2.13=hd590300_5
   - zstd=1.5.2=hfc55251_7
+  - pip:
+    - git+https://github.com/ChristianIngwersen/SportsPose.git
 prefix: /home/rjaikanth97/mambaforge/envs/dissertation-dev
