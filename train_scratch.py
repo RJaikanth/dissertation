@@ -11,4 +11,4 @@ from ultralytics import YOLO
 if __name__ == "__main__":
     model = YOLO("./models/pose/yolov8n-pose.pt")
 
-    model.train(data="/home/rjaikanth97/myspace/dissertation-final/dissertation/dataset/aspset/asp.yaml", epochs=1, imgsz=640)
+    model.train(data="/home/rjaikanth97/myspace/dissertation-final/dissertation/dataset/aspset/combined-ds.yaml", epochs=1, imgsz=640)

@@ -5,110 +5,53 @@ Date  : 23/07/2023
 
 # Enter Description Here
 """
-import os.path
+import pandas as pd
+import re
+from ultralytics import YOLO
+from ast import literal_eval
 
-from torch.utils.data import Dataset
-from collections import defaultdict
-
-import matplotlib.pyplot as plt
 import numpy as np
 
-
-def xyxy2xywhn(bbox, img_size):
-    print(bbox)
-    x = int((bbox[0, 0] + bbox[1, 0]) / 2) / img_size[0]
-    y = int((bbox[0, 1] + bbox[1, 1]) / 2) / img_size[1]
-    w = int(bbox[1, 0] - bbox[0, 0]) / img_size[0]
-    h = int(bbox[0, 1] - bbox[1, 1]) / img_size[1]
-    return [x, y, w, h]
-
-
-def xywhn2xyxy(bbox, img_size):
-    x1 = int(img_size[1] * (bbox[0] - bbox[2] / 2))
-    y1 = int(img_size[0] * (bbox[1] + bbox[3] / 2))
-    x2 = int(img_size[1] * (bbox[0] + bbox[2] / 2))
-    y2 = int(img_size[0] * (bbox[1] - bbox[3] / 2))
-    return [x1, y1, x2, y2]
-
-
-def sampling_function(measurements, index):
-    indices = [k for k in measurements.keys() if k % 5 == 0]
-    choice = np.random.choice(indices)
-    return measurements[choice]
-
-
-def get_bbox(joint, img_size, offset = 100):
-    min_x = min(joint, key = lambda x: x[0])[0]
-    min_y = min(joint, key = lambda x: x[1])[1]
-    max_x = max(joint, key = lambda x: x[0])[0]
-    max_y = max(joint, key = lambda x: x[1])[1]
-
-    tl = [min_x - offset, max_y + offset]
-    br = [max_x + offset, min_y - offset]
-    xyxy = np.asarray([tl, br], dtype=int)
-
-    return np.asarray(xyxy2xywhn(xyxy, img_size))
-
-
-class SPPreProcessingDS(Dataset):
-    def __init__(self, ds):
-        super().__init__()
-        self.ds = ds
-        self.frame_size = set()
-
-    def __getitem__(self, item):
-        sample = self.ds[item]
-        joints = sample['joints_2d']['right']
-        frames = sample['video']['image']['right']
-        vid_name = sample['video']['right']['path']['right'][0]
-
-        num_frames = frames.shape[0]
-
-        for frame_count in range(num_frames):
-            if frame_count % 5 == 0:
-                frame = frames[0]
-                self.frame_size.add(frame.shape)
-                # joint = joints[0]
-                #
-                # plt.imshow(frame)
-                # plt.scatter(joint[:, 0], joint[:, 1], s=1)
-                # plt.show()
-
-            else:
-                continue
-
-        # print(joints.shape, frames.shape, vid_name)
-
-        return
-
-    def __len__(self):
-        return len(self.ds)
-
-
 if __name__ == "__main__":
-    from sportspose.dataset import SportsPoseDataset
-    from glob import glob
+    # model = YOLO("models/pose/yolov8n-pose.pt")
+    # model.train(data="combined.yaml")
 
-    # Outputs joints and frames for each video
-    ds = SportsPoseDataset(data_dir = "./dataset/SportsPose", sample_level = "video", sample_method = sampling_function)
+    # from dtaidistance import dtw_ndim
+    # from dtaidistance import dtw_ndim_visualisation as dtwvis
+    #
+    # cols = ['Nose']#, 'Neck', 'RShoulder',
+    #    # 'RElbow', 'RWrist', 'LShoulder', 'LElbow', 'LWrist', 'MidHip', 'RHip',
+    #    # 'RKnee', 'RAnkle', 'LHip', 'LKnee', 'LAnkle', 'LBigToe', 'LSmallToe',
+    #    # 'LHeel', 'RBigToe', 'RSmallToe', 'RHeel', 'Head']
+    # convertors = {col: lambda x: np.asarray(literal_eval(re.sub(r" +", ",", x))) for col in cols}
+    #
+    # s1 = pd.read_csv(seriesBase, usecols = cols, converters = convertors).to_numpy()
+    # s2 = pd.read_csv(seriesToCompare, usecols = cols, converters = convertors).to_numpy()
+    # path = dtw_ndim.warping_path(s1, s2)
+    # dtwvis.plot_warping(s1, s2, path, filename = "warp.png")
 
-    for i, sample in enumerate(ds):
-        frame = sample['video']['image']['right'][0]
-        joint = sample['joints_2d']['right'][0]
+    from tslearn import metrics
 
-        # transformed = transform(image=frame, keypoints=joint)
-        # joint = np.asarray(transformed['keypoints'])
+    seriesBase = "/home/rjaikanth97/myspace/dissertation-final/dissertation/dataset/socckerkicks-mini/13_freekick.csv"
+    seriesToCompare = "/home/rjaikanth97/myspace/dissertation-final/dissertation/dataset/socckerkicks-mini/AlphaPose_2D_kps.csv"
 
-        bbox = get_bbox(joint, frame.shape)
-        print(bbox)
-        bbox = np.asarray(xywhn2xyxy(bbox, frame.shape)).reshape((2, 2))
-        print(bbox)
-        # print(bbox)
+    cols = ["Nose"]
+    converter = {"Nose": lambda x: np.asarray(literal_eval(re.sub(r" +", ",", x)))}
+    s1 = pd.read_csv(seriesBase, usecols = cols)
+    s1["Nose"] = s1["Nose"].str.replace(r" +", ",", regex = True).apply(literal_eval) #apply(lambda x: re.sub(r" +", ",", x.strip()).split(","))
+    print(np.asarray(s1["Nose"].to_list()).shape)
+    s1 = np.asarray(s1["Nose"].to_list())
 
-        plt.imshow(frame, origin = 'lower')
-        plt.scatter(bbox[:, 0], bbox[:, 1], s = 20, c = 'blue')
-        plt.scatter(joint[:, 0], joint[:, 1], s = 5, c = 'red')
-        plt.show()
-        break
-        continue
-    # print(frames)
+    s2 = pd.read_csv(seriesToCompare, usecols = cols)
+    s2["Nose"] = s2["Nose"].str.replace(r" +", ",", regex = True).apply(literal_eval) #apply(lambda x: re.sub(r" +", ",", x.strip()).split(","))
+    print(np.asarray(s2["Nose"].to_list()).shape)
+    s2 = np.asarray(s2["Nose"].to_list())
+
+    from fastdtw import fastdtw
+
+    from scipy.spatial.distance import euclidean, cosine
+    distance, path = fastdtw(s1, s2, dist = cosine)
+    print(distance)
+
+    sim = metrics.dtw(s1, s2)
+    print(sim)
