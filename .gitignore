@@ -133,3 +133,10 @@ models/
 dataset/
 runs/
 *.txt
+results/
+*.zip
+*.tfevents.*
+*.pt
+*.onnx
+*.jpg
+*.png
